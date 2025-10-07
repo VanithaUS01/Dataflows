@@ -1,0 +1,9 @@
+{
+	"name": "MyPracticeADF01",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "0e47e735-da17-4588-aa64-89ed63b48e31",
+		"tenantId": "8a175fd2-615c-483d-9cb4-1c8c46bb34a3"
+	}
+}

@@ -1,0 +1,99 @@
+{
+	"name": "Emp_Training_DF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Emp_inputData",
+						"type": "DatasetReference"
+					},
+					"name": "Emp"
+				},
+				{
+					"dataset": {
+						"referenceName": "Training_InputData",
+						"type": "DatasetReference"
+					},
+					"name": "Training"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Emp_Training_OutputData",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Join"
+				},
+				{
+					"name": "RemovedColumn"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as string,",
+				"          ManagerID as string,",
+				"          Title as string,",
+				"          MaritalStatus as string,",
+				"          Gender as string,",
+				"          HireDate as string,",
+				"          Dept as string,",
+				"          {Job Grade} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Emp",
+				"source(output(",
+				"          {Start Date} as string,",
+				"          {Course Code} as string,",
+				"          {Course Name} as string,",
+				"          {Employee ID} as string,",
+				"          Cost as string,",
+				"          Supplier as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Training",
+				"Emp, Training join(EmployeeID == {Employee ID},",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> Join",
+				"Join select(mapColumn(",
+				"          EmployeeID,",
+				"          ManagerID,",
+				"          Title,",
+				"          MaritalStatus,",
+				"          Gender,",
+				"          HireDate,",
+				"          Dept,",
+				"          {Job Grade},",
+				"          {Start Date},",
+				"          {Course Code},",
+				"          {Course Name},",
+				"          Cost,",
+				"          Supplier",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> RemovedColumn",
+				"RemovedColumn sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
